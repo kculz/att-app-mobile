@@ -60,10 +60,10 @@ const ReportsScreen = () => {
   
       const currentDate = new Date();
       let weeks = response.weeklyReports.map(report => {
-        const startDate = createSafeDate(report.startDate);
-        const endDate = createSafeDate(report.endDate, startDate);
+        const startDate = createSafeDate(report?.startDate);
+        const endDate = createSafeDate(report?.endDate, startDate);
   
-        const status = report.status || 'Waiting';
+        const status = report?.status || 'Waiting';
         return { ...report, startDate, endDate, status };
       });
   
@@ -86,7 +86,7 @@ const ReportsScreen = () => {
   
   const isReportEditable = (report) => {
     const currentDate = new Date();
-    const reportStartDate = createSafeDate(report.startDate);
+    const reportStartDate = createSafeDate(report?.startDate);
     
     // Allow editing for current or past weeks (not upcoming weeks)
     return reportStartDate <= currentDate;
@@ -125,7 +125,7 @@ const ReportsScreen = () => {
       const currentDate = new Date();
       const totalWeeks = reports.length;
       const weeksCompleted = reports.filter(
-        (report) => createSafeDate(report.endDate) < currentDate
+        (report) => createSafeDate(report?.endDate) < currentDate
       ).length;
       const weeksLeft = totalWeeks - weeksCompleted;
 
@@ -136,8 +136,8 @@ const ReportsScreen = () => {
       // Find the index of the current week
       const currentWeekIndex = reports.findIndex(
         (report) => {
-          const startDate = createSafeDate(report.startDate);
-          const endDate = createSafeDate(report.endDate);
+          const startDate = createSafeDate(report?.startDate);
+          const endDate = createSafeDate(report?.endDate);
           return currentDate >= startDate && currentDate <= endDate;
         }
       );

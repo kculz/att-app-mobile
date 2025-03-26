@@ -8,6 +8,7 @@ export default function RootLayout() {
       <Stack.Screen name="(auth)/StudentLogin" options={{ headerShown: false }} />
       <Stack.Screen name="/chats" options={{ headerShown: false }} />
       <Stack.Screen name='/chats/[chat]' options={{ headerShown: false }} />
+      <Stack.Screen name='/chats/[chat]/messages' options={{ headerShown: false }} />
       <Stack.Screen name="/internship-details" options={{ headerShown: false }} />
       <Stack.Screen name="/schedule/student" options={{ headerShown: false }} />
       <Stack.Screen name="/schedule/supervisor" options={{ headerShown: false }} />

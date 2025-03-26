@@ -78,7 +78,7 @@ const SupervisorDashboard = () => {
                 <TouchableOpacity
                   key={chat._id}
                   className="bg-gray-100 p-4 rounded-lg flex-row justify-between items-center"
-                  onPress={() => router.push(`/chats/${chat._id}/messages`)}
+                  onPress={() => router.push(`/chats/${chat._id}`)}
                 >
                   <View>
                     <Text className="text-lg text-gray-900">

@@ -6,6 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState, useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
 import useGetToken from '@/hooks/useGetToken';
+import useWebSocket from '@/hooks/useWebSocket'; // You'll need to create this hook
 
 const SupervisorSchedule = () => {
   const router = useRouter();
@@ -16,6 +17,48 @@ const SupervisorSchedule = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Connect to WebSocket for real-time supervision calls
+  const { isConnected, messages } = useWebSocket(token);
+
+  // Handle WebSocket messages
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      // Process the latest message
+      const latestMsg = messages[messages.length - 1];
+      
+      if (latestMsg.type === 'incoming_call') {
+        handleIncomingCall(latestMsg);
+      }
+    }
+  }, [messages]);
+
+  // Handle incoming call notification
+  const handleIncomingCall = (callData) => {
+    Alert.alert(
+      "Incoming Supervision Call",
+      `Supervision session with ${callData.callData.student.name} is starting now.`,
+      [
+        {
+          text: "Decline",
+          style: "cancel"
+        },
+        {
+          text: "Join Call", 
+          onPress: () => {
+            router.push({
+              pathname: '/supervision-call',
+              params: {
+                supervisionId: callData.supervisionId,
+                otherUser: callData.callData.student,
+                roomId: callData.roomId,
+              }
+            });
+          }
+        }
+      ]
+    );
+  };
 
   // Fetch supervisions when component mounts and token is available
   useEffect(() => {
@@ -111,6 +154,9 @@ const SupervisorSchedule = () => {
             Select a student and set a supervision date.
           </Text>
         </View>
+
+        {/* WebSocket Connection Status */}
+        
 
         {api.loading ? (
           <View className="flex-1 justify-center items-center py-12">

@@ -59,12 +59,16 @@ const ChatDetailScreen = () => {
       setError(null);
       
       const chatData = await request(`/chats/${id}`, 'GET');
+    
+      // Handle both single chat and chat list responses
+      const messagesData = Array.isArray(chatData) 
+        ? chatData[0]?.messages || [] 
+        : chatData.messages || [];
       
-      if (chatData) {
-        setMessages(chatData.messages || []);
-      }
+      setMessages(messagesData);
       
       return chatData;
+      
     } catch (error) {
       console.error('Error fetching messages:', error);
       setError('Failed to load messages');
