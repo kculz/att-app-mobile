@@ -1,16 +1,24 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import useGetToken from '@/hooks/useGetToken';
 
 const SupervisorDashboard = () => {
   const router = useRouter();
   const { token, loading: tokenLoading } = useGetToken();
-  const { data: chats, error, loading: chatsLoading, request } = useApi(token);
-  
+  const { 
+    data: chats, 
+    error, 
+    loading: apiLoading, 
+    request 
+  } = useApi<any[]>(token);
+
+  // State to manage refresh
+  const [refreshing, setRefreshing] = useState(false);
+
   // Quick links for the supervisor
   const quickLinks = [
     { title: 'Student Progress', icon: 'analytics', route: '/progress/supervisor' },
@@ -18,19 +26,34 @@ const SupervisorDashboard = () => {
     { title: 'Reports & Logs', icon: 'document-text', route: '/reports/supervisor' },
   ];
 
-  useEffect(() => {
-    // Only fetch chats once we have the token
-    if (token && !tokenLoading) {
-      fetchSupervisorChats();
-    }
-  }, [token, tokenLoading]);
+  // Fetch supervisor chats
+  const fetchSupervisorChats = useCallback(async (isRefresh = false) => {
+    if (!token) return;
 
-  const fetchSupervisorChats = async () => {
     try {
-      await request('/chats/supervisor', 'GET');
+      if (isRefresh) setRefreshing(true);
+      
+      await request('/chats/supervisor');
     } catch (err) {
-      console.error('Error in fetchSupervisorChats:', err);
+      console.error('Error fetching supervisor chats:', err);
+    } finally {
+      setRefreshing(false);
     }
+  }, [token, request]);
+
+  // Fetch chats when component mounts or token changes
+  useEffect(() => {
+    fetchSupervisorChats();
+  }, [token]);
+
+  // Pull to refresh handler
+  const onRefresh = useCallback(() => {
+    fetchSupervisorChats(true);
+  }, [fetchSupervisorChats]);
+
+  // Retry loading chats
+  const retryLoading = () => {
+    fetchSupervisorChats();
   };
 
   // Format date for display
@@ -44,12 +67,23 @@ const SupervisorDashboard = () => {
     });
   };
 
-  // Determine if we're in a loading state
-  const isLoading = tokenLoading || chatsLoading;
+  // Determine overall loading state
+  const isLoading = tokenLoading || apiLoading;
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1 p-6">
+      <ScrollView 
+        className="flex-1 p-6"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#3B82F6']} // Android
+            tintColor="#3B82F6" // iOS
+            title="Pull to refresh" // iOS
+          />
+        }
+      >
         {/* Header */}
         <View className="mb-8">
           <Text className="text-3xl font-bold text-gray-900">Supervisor Dashboard</Text>
@@ -63,14 +97,23 @@ const SupervisorDashboard = () => {
           <Text className="text-xl font-bold text-gray-900 mb-4">Student Conversations</Text>
           
           {isLoading ? (
-            <ActivityIndicator size="large" color="#0000ff" className="py-4" />
+            <View className="flex-1 justify-center items-center">
+              <ActivityIndicator size="large" color="#3B82F6" />
+              <Text className="mt-4 text-gray-600">Loading student conversations...</Text>
+            </View>
           ) : error ? (
             <View className="bg-red-50 p-4 rounded-lg">
               <Text className="text-red-600">{error}</Text>
+              <TouchableOpacity 
+                className="mt-4 bg-blue-500 px-4 py-2 rounded-lg"
+                onPress={retryLoading}
+              >
+                <Text className="text-white text-center">Try Again</Text>
+              </TouchableOpacity>
             </View>
           ) : !chats || chats.length === 0 ? (
             <View className="bg-gray-100 p-4 rounded-lg">
-              <Text className="text-gray-600">No active student conversations found.</Text>
+              <Text className="text-gray-600 text-center">No active student conversations found.</Text>
             </View>
           ) : (
             <View className="space-y-4">
@@ -78,7 +121,13 @@ const SupervisorDashboard = () => {
                 <TouchableOpacity
                   key={chat._id}
                   className="bg-gray-100 p-4 rounded-lg flex-row justify-between items-center"
-                  onPress={() => router.push(`/chats/${chat._id}`)}
+                  onPress={() => router.push({
+                    pathname: `/chats/[chat]`,
+                    params: { 
+                      id: chat._id, 
+                      name: chat.supervision?.student?.name || "Student" 
+                    }
+                  })}
                 >
                   <View>
                     <Text className="text-lg text-gray-900">

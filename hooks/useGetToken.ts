@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {jwtDecode} from 'jwt-decode'; // Make sure to install jwt-decode package
 
 const useGetToken = () => {
   const [token, setToken] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Get the token from AsyncStorage
@@ -11,6 +13,14 @@ const useGetToken = () => {
       const storedToken = await AsyncStorage.getItem("authToken");
       if (storedToken) {
         setToken(storedToken);
+        // Extract user ID from the token
+        try {
+          const decodedToken = jwtDecode(storedToken);
+          console.log('decodedToken', decodedToken);
+          setUserId(decodedToken.id);
+        } catch (decodeError) {
+          console.error("Failed to decode token:", decodeError);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch token:", error);
@@ -24,6 +34,14 @@ const useGetToken = () => {
     try {
       await AsyncStorage.setItem("authToken", newToken);
       setToken(newToken);
+      
+      // Extract user ID from the new token
+      try {
+        const decodedToken = jwt_decode(newToken);
+        setUserId(decodedToken.userId || decodedToken.id);
+      } catch (decodeError) {
+        console.error("Failed to decode token:", decodeError);
+      }
     } catch (error) {
       console.error("Failed to save token:", error);
     }
@@ -34,6 +52,7 @@ const useGetToken = () => {
     try {
       await AsyncStorage.removeItem("authToken");
       setToken(null);
+      setUserId(null);
     } catch (error) {
       console.error("Failed to remove token:", error);
     }
@@ -44,7 +63,7 @@ const useGetToken = () => {
     getToken();
   }, []);
 
-  return { token, loading, saveToken, removeToken };
+  return { token, userId, loading, saveToken, removeToken };
 };
 
 export default useGetToken;

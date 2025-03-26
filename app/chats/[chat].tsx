@@ -7,13 +7,11 @@ import {
   FlatList, 
   KeyboardAvoidingView, 
   Platform, 
-  ActivityIndicator,
-  StyleSheet 
+  ActivityIndicator 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { format } from 'date-fns';
 import { useApi } from '@/hooks/useApi';
 import useGetToken from '@/hooks/useGetToken';
@@ -24,32 +22,13 @@ const ChatDetailScreen = () => {
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   
-  const { token } = useGetToken();
+  const { token, userId } = useGetToken();
   const { request } = useApi(token);
   const router = useRouter();
   const { id, name } = useLocalSearchParams();
   const flatListRef = useRef(null);
-
-  // Fetch user information
-  useEffect(() => {
-    const getUserInfo = async () => {
-      try {
-        const userInfoString = await AsyncStorage.getItem('userInfo');
-        if (userInfoString) {
-          const parsedUserInfo = JSON.parse(userInfoString);
-          setUserInfo(parsedUserInfo);
-        }
-      } catch (error) {
-        console.error('Failed to get user info:', error);
-        setError('Failed to load user information');
-      }
-    };
-
-    getUserInfo();
-  }, []);
 
   // Fetch chat messages
   const fetchMessages = async () => {
@@ -132,12 +111,25 @@ const ChatDetailScreen = () => {
 
   // Render a message item
   const renderMessageItem = ({ item }) => {
-    const isMyMessage = userInfo && item.sender._id === userInfo._id;
+    const isMyMessage = userId && item.sender._id === userId;
+    console.log("__________", userId, "+++++++++++++++", item.sender._id);
     
     return (
       <View className={`mb-4 max-w-4/5 ${isMyMessage ? 'self-end' : 'self-start'}`}>
-        <View className={`p-3 rounded-2xl ${isMyMessage ? 'bg-blue-500' : 'bg-gray-200'}`}>
-          <Text className={`${isMyMessage ? 'text-white' : 'text-gray-800'}`}>
+        <View className={`p-3 rounded-2xl ${
+          isMyMessage 
+            ? 'bg-blue-500' 
+            : item.sender.role === 'supervisor' 
+              ? 'bg-green-500' 
+              : 'bg-gray-200'
+        }`}>
+          <Text className={`${
+            isMyMessage 
+              ? 'text-white' 
+              : item.sender.role === 'supervisor' 
+                ? 'text-white' 
+                : 'text-gray-800'
+          }`}>
             {item.content}
           </Text>
         </View>
@@ -147,6 +139,11 @@ const ChatDetailScreen = () => {
           </Text>
           {isMyMessage && item.isRead && (
             <Ionicons name="checkmark-done" size={14} color="#4B5563" />
+          )}
+          {!isMyMessage && (
+            <Text className="text-xs text-gray-500 ml-1">
+              {item.sender.name}
+            </Text>
           )}
         </View>
       </View>
