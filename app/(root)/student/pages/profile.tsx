@@ -77,7 +77,7 @@ const StudentProfile = () => {
       <View className="flex-1 justify-center items-center p-4">
         <Text className="text-red-500 text-center">{error}</Text>
         <TouchableOpacity
-          className="mt-4 bg-blue-500 p-3 rounded-lg"
+          className="mt-4 bg-[#1b583c] p-3 rounded-lg"
           onPress={() => router.push("/")}
         >
           <Text className="text-white font-semibold">Go Back</Text>

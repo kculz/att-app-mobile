@@ -6,7 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState, useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
 import useGetToken from '@/hooks/useGetToken';
-import useWebSocket from '@/hooks/useWebSocket'; // You'll need to create this hook
+import useWebSocket from '@/hooks/useWebSocket';
 
 const SupervisorSchedule = () => {
   const router = useRouter();
@@ -18,22 +18,18 @@ const SupervisorSchedule = () => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Connect to WebSocket for real-time supervision calls
+  // WebSocket connection
   const { isConnected, messages } = useWebSocket(token);
 
-  // Handle WebSocket messages
   useEffect(() => {
     if (messages && messages.length > 0) {
-      // Process the latest message
       const latestMsg = messages[messages.length - 1];
-      
       if (latestMsg.type === 'incoming_call') {
         handleIncomingCall(latestMsg);
       }
     }
   }, [messages]);
 
-  // Handle incoming call notification
   const handleIncomingCall = (callData) => {
     Alert.alert(
       "Incoming Supervision Call",
@@ -60,20 +56,16 @@ const SupervisorSchedule = () => {
     );
   };
 
-  // Fetch supervisions when component mounts and token is available
   useEffect(() => {
     if (token) {
       fetchStudents();
     }
   }, [token]);
 
-  // Fetch students with pending supervisions
   const fetchStudents = async () => {
     try {
       const response = await api.request('/supervisions/supervisor', 'GET');
-      
       if (response) {
-        // Extract student data from supervisions
         const studentData = response.map(supervision => ({
           id: supervision.student._id,
           name: supervision.student.name,
@@ -82,7 +74,6 @@ const SupervisorSchedule = () => {
           status: supervision.status,
           scheduledDate: supervision.start
         }));
-        
         setStudents(studentData);
       }
     } catch (error) {
@@ -91,7 +82,6 @@ const SupervisorSchedule = () => {
     }
   };
 
-  // Handle date change
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -99,7 +89,6 @@ const SupervisorSchedule = () => {
     }
   };
 
-  // Handle setting supervision date
   const handleSetSupervision = async () => {
     if (!selectedStudent) {
       Alert.alert("Error", "Please select a student.");
@@ -123,14 +112,10 @@ const SupervisorSchedule = () => {
       }
     } catch (error) {
       console.error("Error setting supervision:", error);
-      Alert.alert(
-        "Error",
-        "Failed to set supervision. Please try again."
-      );
+      Alert.alert("Error", "Failed to set supervision. Please try again.");
     }
   };
 
-  // Future date validation (must be at least 1 day in advance)
   const isValidDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -139,33 +124,36 @@ const SupervisorSchedule = () => {
   };
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-gray-50">
+    <SafeAreaView edges={['top']} className="flex-1 bg-[#874147]">
       <ScrollView className="flex-1 p-6">
         {/* Header */}
         <View className="mb-8">
           <View className="flex-row items-center justify-between">
             <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="black" />
+              <Ionicons name="arrow-back" size={24} color="white" />
             </TouchableOpacity>
-            <Text className="text-3xl font-bold text-gray-900">Set Supervision</Text>
-            <View style={{ width: 24 }} /> {/* Placeholder to balance the header */}
+            <Text className="text-3xl font-bold text-white">Set Supervision</Text>
+            <View style={{ width: 24 }} />
           </View>
-          <Text className="text-lg text-gray-600 mt-2">
+          <Text className="text-lg text-white mt-2">
             Select a student and set a supervision date.
           </Text>
         </View>
 
-        {/* WebSocket Connection Status */}
-        
+        {/* WebSocket Status */}
+        <View className="mb-4">
+          <Text className={`text-sm ${isConnected ? 'text-green-500' : 'text-red-500'}`}>
+            {isConnected ? 'Connected to real-time updates' : 'Disconnected from real-time updates'}
+          </Text>
+        </View>
 
         {api.loading ? (
           <View className="flex-1 justify-center items-center py-12">
-            <ActivityIndicator size="large" color="#0066CC" />
-            <Text className="mt-4 text-gray-600">Loading students...</Text>
+            <ActivityIndicator size="large" color="#1b583c" />
+            <Text className="mt-4 text-white">Loading students...</Text>
           </View>
         ) : (
           <>
-            {/* Error message */}
             {api.error && (
               <View className="mb-4 p-4 bg-red-100 rounded-lg">
                 <Text className="text-red-700">{api.error}</Text>
@@ -174,23 +162,23 @@ const SupervisorSchedule = () => {
 
             {/* Student List */}
             <View className="bg-white p-6 rounded-2xl shadow-sm mb-6">
-              <Text className="text-xl font-bold text-gray-900 mb-4">Select Student</Text>
+              <Text className="text-xl font-bold text-[#1b583c] mb-4">Select Student</Text>
               
               {students.length === 0 ? (
-                <Text className="text-gray-600 italic">No students found requiring supervision.</Text>
+                <Text className="text-[#1b583c] italic">No students found requiring supervision.</Text>
               ) : (
                 <View className="space-y-4">
                   {students.map((student) => (
                     <TouchableOpacity
                       key={student.id}
                       className={`p-4 rounded-lg ${
-                        selectedStudent?.id === student.id ? 'bg-primary-500' : 'bg-gray-100'
+                        selectedStudent?.id === student.id ? 'bg-[#1b583c]' : 'bg-gray-100'
                       }`}
                       onPress={() => setSelectedStudent(student)}
                     >
                       <Text
                         className={`text-lg ${
-                          selectedStudent?.id === student.id ? 'text-white' : 'text-gray-900'
+                          selectedStudent?.id === student.id ? 'text-white' : 'text-[#1b583c]'
                         }`}
                       >
                         {student.name}
@@ -219,12 +207,12 @@ const SupervisorSchedule = () => {
 
             {/* Date Picker */}
             <View className="bg-white p-6 rounded-2xl shadow-sm mb-6">
-              <Text className="text-xl font-bold text-gray-900 mb-4">Set Date and Time</Text>
+              <Text className="text-xl font-bold text-[#1b583c] mb-4">Set Date and Time</Text>
               <TouchableOpacity
                 className="bg-gray-100 p-3 rounded-lg"
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text className="text-gray-900 font-semibold">
+                <Text className="text-[#1b583c] font-semibold">
                   {date.toLocaleString()}
                 </Text>
               </TouchableOpacity>
@@ -249,7 +237,7 @@ const SupervisorSchedule = () => {
             {/* Set Supervision Button */}
             <TouchableOpacity
               className={`p-4 rounded-lg flex-row items-center justify-center ${
-                selectedStudent && isValidDate() ? 'bg-primary-500' : 'bg-gray-300'
+                selectedStudent && isValidDate() ? 'bg-[#1b583c]' : 'bg-gray-300'
               }`}
               onPress={handleSetSupervision}
               disabled={!selectedStudent || !isValidDate() || api.loading}

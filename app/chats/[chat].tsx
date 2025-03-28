@@ -118,7 +118,7 @@ const ChatDetailScreen = () => {
       <View className={`mb-4 max-w-4/5 ${isMyMessage ? 'self-end' : 'self-start'}`}>
         <View className={`p-3 rounded-2xl ${
           isMyMessage 
-            ? 'bg-blue-500' 
+            ? 'bg-[#1b583c]' 
             : item.sender.role === 'supervisor' 
               ? 'bg-green-500' 
               : 'bg-gray-200'
@@ -178,7 +178,7 @@ const ChatDetailScreen = () => {
               <Ionicons name="alert-circle-outline" size={60} color="#EF4444" />
               <Text className="text-gray-700 text-lg font-semibold mt-4 text-center">{error}</Text>
               <TouchableOpacity 
-                className="mt-6 bg-blue-500 px-6 py-3 rounded-lg"
+                className="mt-6 bg-[#1b583c] px-6 py-3 rounded-lg"
                 onPress={handleRefresh}
               >
                 <Text className="text-white font-medium">Try Again</Text>
@@ -228,7 +228,7 @@ const ChatDetailScreen = () => {
               maxLength={500}
             />
             <TouchableOpacity 
-              className={`rounded-full p-2 ${newMessage.trim() ? 'bg-blue-500' : 'bg-gray-300'}`}
+              className={`rounded-full p-2 ${newMessage.trim() ? 'bg-[#1b583c]' : 'bg-gray-300'}`}
               onPress={sendMessage}
               disabled={!newMessage.trim() || sendingMessage}
             >

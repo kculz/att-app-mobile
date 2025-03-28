@@ -3,7 +3,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Dashboard from '../pages/dashboard';
 import Profile from '../pages/profile';
 import Companies from '../pages/companies';
-import Students from '../pages/students';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,10 +15,6 @@ const SupervisorTabs = () => {
           let iconName;
           if (route.name === 'Dashboard') {
             iconName = 'home';
-          } else if (route.name === 'Companies') {
-            iconName = 'business';
-          } else if (route.name === 'Students') {
-            iconName = 'people';
           } else if (route.name === 'Profile') {
             iconName = 'person';
           }
@@ -28,7 +23,6 @@ const SupervisorTabs = () => {
       })}
     >
       <Tab.Screen name="Dashboard" component={Dashboard} />
-      <Tab.Screen name="Companies" component={Companies} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );

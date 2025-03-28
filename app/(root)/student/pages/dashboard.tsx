@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const StudentDashboard = () => {
   const router = useRouter();
-  const userName = "John Doe"; // Replace with dynamic user name from state or context
 
   const features = [
     { title: 'Chats', icon: 'chatbubbles', route: '/chats' },
@@ -17,11 +16,11 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1  ">
+    <SafeAreaView edges={['top']} className="flex-1 bg-[#874147]">
       {/* Welcome Header */}
       <View className="bg-white p-6 shadow-sm">
-        <Text className="text-3xl font-bold text-gray-900">Welcome, {userName}!</Text>
-        <Text className="text-lg text-gray-600 mt-2">
+        <Text className="text-3xl font-bold text-[#1b583c]">Welcome!</Text>
+        <Text className="text-lg text-[#1b583c] opacity-80 mt-2">
           Let's make today productive and meaningful.
         </Text>
       </View>
@@ -37,8 +36,8 @@ const StudentDashboard = () => {
                 activeOpacity={0.8}
                 style={{ height: 150 }} // Fixed height for all cards
               >
-                <Ionicons name={item.icon} size={32} color="#3B82F6" />
-                <Text className="text-gray-800 font-semibold text-lg mt-2 text-center">
+                <Ionicons name={item.icon} size={32} color="#1b583c" />
+                <Text className="text-[#1b583c] font-semibold text-lg mt-2 text-center">
                   {item.title}
                 </Text>
               </TouchableOpacity>

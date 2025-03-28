@@ -205,7 +205,7 @@ const EditWeeklyReport = () => {
 
           {/* Add More Working Days
           <TouchableOpacity
-            className="mb-6 p-3 bg-blue-500 rounded-lg flex-row justify-center items-center"
+            className="mb-6 p-3 bg-[#1b583c] rounded-lg flex-row justify-center items-center"
             onPress={addWorkingDays}
           >
             <Text className="text-white font-semibold text-lg">+ Add Working Days</Text>
@@ -227,7 +227,7 @@ const EditWeeklyReport = () => {
 
         {/* Save Button */}
         <TouchableOpacity
-          className="mt-8 bg-primary-500 p-4 rounded-lg flex-row justify-center items-center"
+          className="mt-8 bg-[#1b583c] p-4 rounded-lg flex-row justify-center items-center"
           onPress={handleSave}
           disabled={saving}
         >

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {jwtDecode} from 'jwt-decode'; // Make sure to install jwt-decode package
+import { jwtDecode } from 'jwt-decode'; // Correct import (note the capital D)
 
 const useGetToken = () => {
   const [token, setToken] = useState(null);
@@ -16,8 +16,7 @@ const useGetToken = () => {
         // Extract user ID from the token
         try {
           const decodedToken = jwtDecode(storedToken);
-          console.log('decodedToken', decodedToken);
-          setUserId(decodedToken.id);
+          setUserId(decodedToken.userId || decodedToken.id || decodedToken.sub);
         } catch (decodeError) {
           console.error("Failed to decode token:", decodeError);
         }
@@ -37,8 +36,8 @@ const useGetToken = () => {
       
       // Extract user ID from the new token
       try {
-        const decodedToken = jwt_decode(newToken);
-        setUserId(decodedToken.userId || decodedToken.id);
+        const decodedToken = jwtDecode(newToken); // Using correct function name
+        setUserId(decodedToken.userId || decodedToken.id || decodedToken.sub);
       } catch (decodeError) {
         console.error("Failed to decode token:", decodeError);
       }

@@ -70,7 +70,7 @@ const StudentSchedule = () => {
     <SafeAreaView className="flex-1 p-4">
       <ScrollView className="space-y-4">
         {/* Header */}
-        <View className="bg-blue-500 p-4 rounded-lg">
+        <View className="bg-[#1b583c] p-4 rounded-lg">
           <Text className="text-white text-xl font-bold">Supervision Schedule</Text>
           <Text className="text-white text-sm">View your upcoming supervision details.</Text>
         </View>

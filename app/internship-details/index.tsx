@@ -148,7 +148,7 @@ const InternshipDetails = () => {
               No internship details found. Please add your internship information.
             </Text>
             <TouchableOpacity
-              className="bg-blue-500 px-8 py-4 rounded-xl w-full"
+              className="bg-[#1b583c] px-8 py-4 rounded-xl w-full"
               onPress={() => setModalVisible(true)}>
               <Text className="text-white text-center font-bold text-lg">Add Internship Details</Text>
             </TouchableOpacity>
@@ -158,7 +158,7 @@ const InternshipDetails = () => {
             {/* Action button for existing internship */}
             <View className="mb-6">
               <TouchableOpacity
-                className="bg-blue-500 px-6 py-3 rounded-xl flex-row items-center justify-center"
+                className="bg-[#1b583c] px-6 py-3 rounded-xl flex-row items-center justify-center"
                 onPress={() => setModalVisible(true)}>
                 <Ionicons name="create-outline" size={20} color="white" />
                 <Text className="text-white text-center font-bold text-base ml-2">Edit Internship Details</Text>
@@ -343,7 +343,7 @@ const InternshipDetails = () => {
 
               <View className="mt-6 space-y-3">
                 <TouchableOpacity
-                  className="bg-blue-500 p-4 rounded-xl"
+                  className="bg-[#1b583c] p-4 rounded-xl"
                   onPress={saveInternshipDetails}>
                   <Text className="text-white text-center font-bold text-lg">
                     {hasInternship ? 'Update Details' : 'Save Details'}

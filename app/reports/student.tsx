@@ -224,7 +224,7 @@ const ReportsScreen = () => {
           <View className="flex flex-row justify-between items-center mb-4">
             <Text className="text-3xl font-bold text-gray-900">Weekly Reports</Text>
             {/* <TouchableOpacity
-              className="bg-blue-500 p-3 rounded-lg flex-row items-center"
+              className="bg-[#1b583c] p-3 rounded-lg flex-row items-center"
               onPress={() => router.push('/student/set-holidays')}
             >
               <Ionicons name="calendar" size={20} color="white" />
@@ -235,7 +235,7 @@ const ReportsScreen = () => {
           {/* Progress Bar */}
             {/* <View className="bg-gray-200 rounded-full h-4">
               <View
-                className="bg-blue-500 rounded-full h-4"
+                className="bg-[#1b583c] rounded-full h-4"
                 style={{ width: `${(weeksCompleted / totalWeeks) * 100}%` }}
               />
             </View> */}
@@ -249,7 +249,7 @@ const ReportsScreen = () => {
         {/* Pagination */}
         <View className="flex flex-row justify-between items-center mx-4 mb-6">
           <TouchableOpacity
-            className={`p-3 rounded-lg ${visibleStartIndex > 0 ? 'bg-blue-500' : 'bg-gray-300'}`}
+            className={`p-3 rounded-lg ${visibleStartIndex > 0 ? 'bg-[#1b583c]' : 'bg-gray-300'}`}
             onPress={handlePreviousWeeks}
             disabled={visibleStartIndex === 0}
           >
@@ -263,7 +263,7 @@ const ReportsScreen = () => {
           )}
           
           <TouchableOpacity
-            className={`p-3 rounded-lg ${visibleStartIndex + 5 < weeklyReports.length ? 'bg-blue-500' : 'bg-gray-300'}`}
+            className={`p-3 rounded-lg ${visibleStartIndex + 5 < weeklyReports.length ? 'bg-[#1b583c]' : 'bg-gray-300'}`}
             onPress={handleNextWeeks}
             disabled={visibleStartIndex + 5 >= weeklyReports.length}
           >
@@ -318,7 +318,7 @@ const ReportsScreen = () => {
 
                   {isReportEditable(report) && (
                     <TouchableOpacity
-                      className="mt-4 bg-blue-500 p-3 rounded-lg flex-row items-center justify-center"
+                      className="mt-4 bg-[#1b583c] p-3 rounded-lg flex-row items-center justify-center"
                       onPress={() => router.push(`/reports/edit/${report?.weekNumber}`)}
                     >
                       <Ionicons name="pencil" size={20} color="white" />

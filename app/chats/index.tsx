@@ -120,7 +120,7 @@ const StudentChatScreen = () => {
             <Ionicons name="alert-circle-outline" size={60} color="#EF4444" />
             <Text className="text-gray-700 text-lg font-semibold mt-4 text-center">{error}</Text>
             <TouchableOpacity 
-              className="mt-6 bg-blue-500 px-6 py-3 rounded-lg"
+              className="mt-6 bg-[#1b583c] px-6 py-3 rounded-lg"
               onPress={retryLoading}
             >
               <Text className="text-white font-medium">Try Again</Text>
@@ -151,7 +151,7 @@ const StudentChatScreen = () => {
                 </View>
                 
                 <TouchableOpacity
-                  className="bg-blue-500 py-4 rounded-lg"
+                  className="bg-[#1b583c] py-4 rounded-lg"
                   onPress={navigateToChat}
                 >
                   <View className="flex-row justify-center items-center">

@@ -106,7 +106,7 @@ const StudentProgress = () => {
           <View className="mb-6">
             <View className="flex flex-row justify-between items-center mb-2">
               <Text className="text-gray-600">Completion</Text>
-              <Text className="text-primary-600 font-bold">{percentageCompleted}%</Text>
+              <Text className="text-[#1b583c] font-bold">{percentageCompleted}%</Text>
             </View>
             <View className="bg-gray-200 rounded-full h-3">
               <View
@@ -147,7 +147,7 @@ const StudentProgress = () => {
             <View className="mb-6">
               <View className="flex flex-row justify-between items-center mb-2">
                 <Text className="text-gray-600">Task Completion</Text>
-                <Text className="text-primary-600 font-bold">{tasksPercentage}%</Text>
+                <Text className="text-[#1b583c] font-bold">{tasksPercentage}%</Text>
               </View>
               <View className="bg-gray-200 rounded-full h-3">
                 <View

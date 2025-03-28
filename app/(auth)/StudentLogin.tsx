@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, 
-  Platform, ScrollView, Alert, ActivityIndicator 
+  Platform, ScrollView, Alert, ActivityIndicator, Image 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useApi } from '@/hooks/useApi'; // Adjust path based on your project structure
-import useGetToken from '@/hooks/useGetToken'; // Import the useGetToken hook
+import { useApi } from '@/hooks/useApi';
+import useGetToken from '@/hooks/useGetToken';
 
 const StudentLoginScreen = () => {
-  const [loginInput, setLoginInput] = useState(''); // ID, Email, or Phone
+  const [loginInput, setLoginInput] = useState('');
   const [password, setPassword] = useState('');
 
   const router = useRouter();
   const { error, loading, request } = useApi();
-  const { saveToken } = useGetToken(); // Use the saveToken function from useGetToken
+  const { saveToken } = useGetToken();
 
   const handleLogin = async () => {
     if (!loginInput || !password) {
@@ -25,8 +25,6 @@ const StudentLoginScreen = () => {
     console.log("Sending request with payload:", { email: loginInput, password });
     
     try {
-      // Instead of awaiting the request and then checking data afterwards,
-      // capture the response directly from the request
       const response = await request('/auth/student/login', 'POST', {
         email: loginInput.trim(),
         password: password.trim(),
@@ -36,15 +34,13 @@ const StudentLoginScreen = () => {
       
       if (response?.token) {
         console.log('Login Successful:', response);
-        await saveToken(response.token); // Save the token to AsyncStorage
+        await saveToken(response.token);
         console.log('Token saved:', response.token);
         router.replace('/student/(tabs)/');
       } else {
-        // If we got a response but no token
         Alert.alert('Login Failed', 'Invalid credentials or server error.');
       }
     } catch (err) {
-      // This will catch any errors that weren't handled by useApi
       console.error("Login Error:", err.message || error);
       Alert.alert('Login Failed', err.message || error || 'An error occurred during login.');
     }
@@ -56,16 +52,26 @@ const StudentLoginScreen = () => {
       className="flex-1"
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="flex-1 justify-center p-4 bg-primary-500">
+        {/* Updated background color to a light blue/gray */}
+        <View className="flex-1 justify-center p-4 bg-[#874147]">
           {/* Login Container */}
-          <View className="bg-white p-6 rounded-lg">
-            <View className="flex justify-center items-center">
-              <Text className="text-4xl font-bold text-black mb-2">Welcome!</Text>
-              <Text className="text-lg mb-8 text-black">Student Login</Text>
+          <View className="bg-white p-6 rounded-lg shadow-md">
+            {/* University Logo and Header */}
+            <View className="flex justify-center items-center mb-6">
+              {/* Replace with your actual logo path */}
+              <Image 
+                source={require('@/assets/images/msus.png')} 
+                className="w-40 h-40 mb-4"
+                resizeMode="contain"
+              />
+              <Text className="text-2xl font-bold text-[#1b583c] mb-1">MANICALAND STATE UNIVERSITY</Text>
+              <Text className="text-lg font-semibold text-[#1b583c] mb-4">APPLIED SCIENCES</Text>
+              <Text className="text-xl font-bold text-[#1b583c] mb-2">Welcome!</Text>
+              <Text className="text-lg text-[#003366]">Student Login</Text>
             </View>
 
-            {/* ID / Email / Phone Input */}
-            <Text className="text-lg font-semibold mb-2 text-primary-500">ID | Email | Phone</Text>
+            {/* Email Input */}
+            <Text className="text-lg font-semibold mb-2 text-[#1b583c]">Email</Text>
             <TextInput
               className="border border-gray-300 p-3 rounded-lg mb-4 text-gray-700"
               placeholder="Enter ID, Email, or Phone"
@@ -77,7 +83,7 @@ const StudentLoginScreen = () => {
             />
 
             {/* Password Input */}
-            <Text className="text-lg font-semibold mb-2 text-primary-500">Password</Text>
+            <Text className="text-lg font-semibold mb-2 text-[#1b583c]">Password</Text>
             <TextInput
               className="border border-gray-300 p-3 rounded-lg mb-4 text-gray-700"
               placeholder="Enter your password"
@@ -88,9 +94,9 @@ const StudentLoginScreen = () => {
               autoCapitalize="none"
             />
 
-            {/* Login Button */}
+            {/* Login Button - Updated to blue */}
             <TouchableOpacity
-              className="bg-primary-500 p-3 rounded-lg flex-row justify-center items-center"
+              className="bg-[#1b583c] p-3 rounded-lg flex-row justify-center items-center"
               onPress={handleLogin}
               disabled={loading}
             >
@@ -102,14 +108,6 @@ const StudentLoginScreen = () => {
                   <Text className="text-white text-lg font-semibold ml-2">Login</Text>
                 </>
               )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Registration Prompt */}
-          <View className="mt-6 items-center">
-            <Text className="text-white text-lg">Haven't registered yet?</Text>
-            <TouchableOpacity onPress={() => router.push('/register')}>
-              <Text className="text-white text-lg font-semibold underline">Register here</Text>
             </TouchableOpacity>
           </View>
         </View>
