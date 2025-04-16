@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
 
-const BASE_URL = "http://167.172.134.219:3000/api/v1"; // Change this to your backend URL
+const BASE_URL = "http://172.20.10.7:3001/api/v1"; // Change this to your backend URL
 
 type HttpMethod = "GET" | "POST" | "DELETE" | "PATCH";
 

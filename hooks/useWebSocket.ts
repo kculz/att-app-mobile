@@ -1,148 +1,175 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Alert } from 'react-native';
+import useGetToken from './useGetToken';
 
 const useWebSocket = () => {
-  const [socket, setSocket] = useState(null);
+  const { userId, token } = useGetToken();
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [connectionAttempts, setConnectionAttempts] = useState(0);
   const socketRef = useRef(null);
+  const reconnectAttempts = useRef(0);
 
-  // IMPORTANT: Replace with your actual WebSocket server URL
-  const WS_URL = 'ws://167.172.134.219:3000/ws';
+  const WS_URL = `ws://172.20.10.7:3001/ws?token=${token}`;
 
   const connectWebSocket = useCallback(() => {
-    // Prevent multiple simultaneous connection attempts
-    if (socketRef.current && socketRef.current.readyState !== WebSocket.CLOSED) {
+    if (socketRef.current && [WebSocket.CONNECTING, WebSocket.OPEN].includes(socketRef.current.readyState)) {
       return;
     }
 
-    console.log('Attempting WebSocket connection:', WS_URL);
-
+    console.log('Attempting WebSocket connection...');
+    
     try {
       const ws = new WebSocket(WS_URL);
       socketRef.current = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket Connected Successfully');
+        console.log('WebSocket connected successfully');
         setIsConnected(true);
-        setConnectionAttempts(0);
+        reconnectAttempts.current = 0;
         
-        // Optional: Send a connection confirmation message
-        ws.send(JSON.stringify({ type: 'connect', message: 'Hello Server!' }));
+        ws.send(JSON.stringify({
+          type: 'presence_update',
+          status: 'online',
+          userId,
+          timestamp: new Date().toISOString()
+        }));
       };
 
       ws.onmessage = (event) => {
         try {
-          console.log('Received WebSocket message:', event.data);
+          const messageString = event.data.toString();
+          const data = JSON.parse(messageString);
           
-          // Try to parse the message, but handle both JSON and string messages
-          let data;
-          try {
-            data = JSON.parse(event.data);
-          } catch {
-            data = { type: 'raw', message: event.data };
+          console.log('Received WebSocket message:', data);
+          setMessages(prev => [...prev, data]);
+          
+          // Handle specific message types
+          switch(data.type) {
+            case 'chat_message':
+              // Handle incoming chat message
+              break;
+            case 'incoming_call':
+              // Handle incoming call
+              break;
+            case 'call_signal':
+              // Handle WebRTC signaling
+              break;
+            case 'error':
+              console.error('WebSocket error:', data.message);
+              Alert.alert('WebSocket Error', data.message);
+              break;
+            default:
+              console.log('Unknown message type:', data.type);
           }
-
-          // Add message to state
-          setMessages(prevMessages => [...prevMessages, data]);
-        } catch (parseError) {
-          console.error('Error processing WebSocket message:', parseError);
+        } catch (error) {
+          console.error('Error processing WebSocket message:', error);
         }
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket Disconnected', {
-          code: event.code,
-          reason: event.reason,
-          wasClean: event.wasClean
-        });
-        
+        console.log(`WebSocket disconnected (code: ${event.code}, reason: ${event.reason})`);
         setIsConnected(false);
         
-        // Exponential backoff for reconnection
-        const timeout = Math.min(30000, Math.pow(2, connectionAttempts) * 1000);
+        // Exponential backoff reconnection
+        const delay = Math.min(30000, Math.pow(2, reconnectAttempts.current) * 1000);
+        reconnectAttempts.current += 1;
         
         setTimeout(() => {
-          setConnectionAttempts(prev => prev + 1);
+          console.log(`Attempting reconnect (attempt ${reconnectAttempts.current})`);
           connectWebSocket();
-        }, timeout);
-
-        // Show alert if disconnection wasn't clean
-        if (!event.wasClean) {
-          console.log(
-            'Connection Lost',
-            'WebSocket connection was interrupted. Attempting to reconnect...'
-          );
-        }
+        }, delay);
       };
 
       ws.onerror = (error) => {
-        console.error('WebSocket Error Details:', {
-          message: error.message,
-          error: JSON.stringify(error)
-        });
-
-        console.log(
-          'WebSocket Connection Error',
-          `Unable to establish WebSocket connection. Please check your network and try again. 
-          Error: ${error.message}`
-        );
-
+        console.error('WebSocket error:', error);
         setIsConnected(false);
       };
-
-      setSocket(ws);
-    } catch (setupError) {
-      console.log(
-        'Connection Error',
-        'Failed to set up WebSocket connection'
-      );
+    } catch (error) {
+      console.error('WebSocket setup error:', error);
+      Alert.alert('Connection Error', 'Failed to setup WebSocket connection');
     }
+  }, [token, userId]);
 
-    // Cleanup function
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
-    };
-  }, [connectionAttempts]);
-
-  // Connect on component mount
-  useEffect(() => {
-    connectWebSocket();
-
-    // Cleanup on unmount
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
-    };
-  }, [connectWebSocket]);
-
-  // Method to send messages
   const sendMessage = useCallback((message) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      // Ensure message is stringified if it's an object
-      const messageToSend = typeof message === 'object' 
-        ? JSON.stringify(message) 
-        : message;
-      
-      socket.send(messageToSend);
-      console.log('Sent WebSocket message:', messageToSend);
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      try {
+        const messageToSend = typeof message === 'object' 
+          ? JSON.stringify({ 
+              ...message,
+              timestamp: new Date().toISOString()
+            })
+          : message;
+        
+        console.log('Sending WebSocket message:', messageToSend);
+        socketRef.current.send(messageToSend);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        Alert.alert('Error', 'Failed to send message');
+      }
     } else {
-      console.error('WebSocket is not open. Unable to send message.');
-      console.log(
-        'Connection Error',
-        'Cannot send message. WebSocket is not connected.'
-      );
+      console.error('Cannot send message - WebSocket not connected');
+      Alert.alert('Connection Error', 'Cannot send message. Please check your connection.');
     }
-  }, [socket]);
+  }, []);
+
+  const sendChatMessage = useCallback((recipientId, content, chatId) => {
+    sendMessage({
+      type: 'chat_message',
+      recipientId,
+      content,
+      chatId
+    });
+  }, [sendMessage]);
+
+  const initiateCall = useCallback((studentId) => {
+    sendMessage({
+      type: 'call_initiate',
+      studentId
+    });
+  }, [sendMessage]);
+
+  const joinCall = useCallback((callId) => {
+    sendMessage({
+      type: 'call_join',
+      callId
+    });
+  }, [sendMessage]);
+
+  const endCall = useCallback((callId) => {
+    sendMessage({
+      type: 'call_end',
+      callId
+    });
+  }, [sendMessage]);
+
+  const rejectCall = useCallback((callId) => {
+    sendMessage({
+      type: 'call_reject',
+      callId
+    });
+  }, [sendMessage]);
+
+  useEffect(() => {
+    if (token && userId) {
+      connectWebSocket();
+    }
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+  }, [token, userId, connectWebSocket]);
 
   return {
     isConnected,
     messages,
     sendMessage,
+    sendChatMessage,
+    initiateCall,
+    joinCall,
+    endCall,
+    rejectCall,
     reconnect: connectWebSocket
   };
 };

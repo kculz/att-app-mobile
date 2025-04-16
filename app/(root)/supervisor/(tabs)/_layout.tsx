@@ -18,7 +18,7 @@ const SupervisorTabs = () => {
           } else if (route.name === 'Profile') {
             iconName = 'person';
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={'green'} />;
         },
       })}
     >

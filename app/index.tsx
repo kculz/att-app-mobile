@@ -32,6 +32,15 @@ const WelcomeScreen = () => {
         <Text className="text-white text-lg font-semibold ml-2">Supervisor Login</Text>
       </TouchableOpacity>
 
+      {/* Coordinator Login Button */}
+      <TouchableOpacity
+        className="bg-[#874147] flex-row items-center justify-center p-4 rounded-lg w-full max-w-xs mb-4"
+        onPress={() => router.push('/(auth)/CordinatorLogin')}
+      >
+        <Ionicons name="briefcase" size={24} color="white" />
+        <Text className="text-white text-lg font-semibold ml-2">Coordinator Login</Text>
+      </TouchableOpacity>
+
       {/* Student Login Button */}
       <TouchableOpacity
         className="bg-[#1b583c] flex-row items-center justify-center p-4 rounded-lg w-full max-w-xs"
