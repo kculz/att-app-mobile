@@ -9,7 +9,7 @@ const useWebSocket = () => {
   const socketRef = useRef(null);
   const reconnectAttempts = useRef(0);
 
-  const WS_URL = `ws://172.20.10.7:3001/ws?token=${token}`;
+  const WS_URL = `ws://172.20.10.5:3001/ws?token=${token}`;
 
   const connectWebSocket = useCallback(() => {
     if (socketRef.current && [WebSocket.CONNECTING, WebSocket.OPEN].includes(socketRef.current.readyState)) {
